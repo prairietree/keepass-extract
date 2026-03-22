@@ -3,7 +3,7 @@ use std::fs::{self, File, OpenOptions};
 use std::path::PathBuf;
 use std::process::exit;
 use std::path::Path;
-use std::io::{self, Write};
+use std::io::{self, IsTerminal};
 use regex::Regex;
 
 use keepass::{
@@ -88,16 +88,17 @@ fn main() {
         exit(51);
     }
 
-    // Read password from file or prompt. The password is never printed to stdout, only the prompt is printed to stderr.
+    // Read password from file or prompt.
     let password = if let Some(pw_file) = args.pw_file {
         fs::read_to_string(pw_file).expect("Failed to read password file").trim().to_string()
+    }  else if io::stdin().is_terminal() {
+        // If stdin is a terminal then prompt for the password.
+        rpassword::prompt_password("Enter KeePass password: ").expect("Failed to read password")
     } else {
-        eprint!("Enter KeePass password: ");
-        io::stderr().flush().unwrap();
-
+        // This is for your unit test and scripts. Ex: keepass-extract --database db.kdbx --entry "Gmail" <<< "$PASS"
         let mut input = String::new();
         io::stdin().read_line(&mut input).expect("Failed to read line");
-        input.trim_matches(|c| c == '\n' || c == '\r').to_string() // .trim() removes the \n so keepass can use the raw password
+        input.trim_end_matches(['\r', '\n']).to_string()
     };
 
     // Build the database key, adding the key file if provided.
@@ -179,7 +180,7 @@ fn main() {
         } else {
             // If no --field was requested, print the list of field names
             for (name, _) in &export_data {
-                println!("{}", name);
+                eprintln!("{}", name);
             }
         }
     }
