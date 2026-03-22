@@ -13,3 +13,10 @@ regex = "1"
 assert_cmd = "2.2.0"
 tempfile = "3.27.0"
 predicates = "3.1"
+
+[profile.release]
+strip = true      # Removes debug symbols (the biggest bloat)
+# opt-level = "z"   # Optimize for size
+lto = true        # Link Time Optimization (removes unused code across crates)
+codegen-units = 1 # Better optimization, slower compile
+# panic = "abort"   # Removes stack unwinding code (saves ~100KB+)

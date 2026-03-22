@@ -41,7 +41,6 @@ fn test_62_duplicate_entry_exports_first_match() {
         "--database", DB_PATH, 
         "--entry", "same_name",
         "--folder", tmp_dir.path().to_str().unwrap(),
-        "--exclude", "" // Disable default filter to ensure we see files for the first match
     ])
     .write_stdin(PASS)
     .assert()
@@ -63,7 +62,6 @@ fn test_success_export_and_file_content_checks() {
         "--database", DB_PATH, 
         "--entry", "test-extract",
         "--folder", dest.to_str().unwrap(),
-        "--exclude", "" // IMPORTANT: Disable default filter to see UserName/Title files
     ])
     .write_stdin(PASS)
     .assert()

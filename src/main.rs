@@ -4,7 +4,6 @@ use std::path::PathBuf;
 use std::process::exit;
 use std::path::Path;
 use std::io::{self, IsTerminal};
-use regex::Regex;
 
 use keepass::{
     db::{Database, Group},
@@ -13,6 +12,11 @@ use keepass::{
 
 #[cfg(unix)]
 use std::os::unix::fs::PermissionsExt;
+
+// Define the default fields to exclude as a static array
+const DEFAULT_FIELDS: &[&str] = &[
+    "Title", "UserName", "Password", "URL", "Notes", "UUID", "TOTP", "Tags", "Uuid"
+];
 
 #[derive(Parser)]
 #[command(
@@ -56,9 +60,9 @@ struct Args {
     #[arg(short, long)]
     pw_file: Option<PathBuf>,
 
-    /// Regex of fields to filter out of entry export (default excludes common fields like Title, Username, Password, URL, Notes, UUID, TOTP, Tags)
-    #[arg(short = 'x', long, default_value = "^(Title|UserName|Password|URL|Notes|UUID|TOTP|Tags|Uuid)$")]
-    exclude: String,
+    /// If set, filters out default fields (Title, Password, etc.) from the export
+    #[arg(short = 'x', long)]
+    exclude_defaults: bool,
 }
 
 // Recursive helper to flatten all entries into one list
@@ -151,18 +155,11 @@ fn main() {
     } else {
         // Case: No specific field requested, export all fields except those matching the exclude regex (if provided).
         // Compile regex only if a string is provided; otherwise, allow all fields.
-        let exclude_re = if !args.exclude.is_empty() {
-            Some(Regex::new(&args.exclude).expect("Invalid regex provided in --exclude"))
-        } else {
-            None
-        };
-
-       entry.fields
+        entry.fields
             .iter()
-            // If exclude_re is Some, filter out matches. If None, keep everything.
             .filter(|(k, _)| {
-                if let Some(re) = &exclude_re {
-                    !re.is_match(k)
+                if args.exclude_defaults {
+                    !DEFAULT_FIELDS.iter().any(|&default| k.eq_ignore_ascii_case(default))
                 } else {
                     true
                 }

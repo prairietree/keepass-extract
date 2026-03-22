@@ -41,7 +41,6 @@ fn test_62_multiple_entries_found() {
         "--database", DB_PATH, 
         "--key-file", KEY_PATH, 
         "--entry", "same_name",
-        "--exclude", "" 
     ])
     .write_stdin(PASS)
     .assert()
