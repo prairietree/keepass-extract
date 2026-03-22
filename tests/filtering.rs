@@ -1,13 +1,7 @@
 use assert_cmd::Command;
-use predicates::prelude::*;
-use std::fs;
 use tempfile::tempdir;
 
-#[cfg(unix)]
-use std::os::unix::fs::PermissionsExt;
-
 const DB_PATH: &str = "tests/files/testpw.kdbx";
-const KEY_PATH: &str = "tests/files/testkf.key"; // Added if needed for consistency
 const PASS: &str = "test123\n";
 
 #[test]

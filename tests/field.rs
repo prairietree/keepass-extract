@@ -1,13 +1,7 @@
 use assert_cmd::Command;
 use predicates::prelude::*;
-use std::fs;
-use tempfile::tempdir;
-
-#[cfg(unix)]
-use std::os::unix::fs::PermissionsExt;
 
 const DB_PATH: &str = "tests/files/testpw.kdbx";
-const KEY_PATH: &str = "tests/files/testkf.key"; // Added if needed for consistency
 const PASS: &str = "test123\n";
 
 #[test]
@@ -25,8 +19,8 @@ fn test_71_field_not_found_exits_cleanly() {
     .assert()
     .failure()
     .code(71)
-    .stdout("") // Should print nothing to stdout
-    .stderr("Error: Field 'non-existent-field' not found in entry 'test-extract'.\n"); // Code currently exits directly without an error message
+    .stdout("")
+    .stderr("Error: Field 'non-existent-field' not found in entry 'test-extract'.\n");
 }
 
 #[test]
