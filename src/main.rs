@@ -143,7 +143,10 @@ fn main() {
         // Case: Specific field requested. If not found, exit(71).
         let value = entry.get(field_name)
             .map(|v| v.to_string())
-            .unwrap_or_else(|| exit(71));
+            .unwrap_or_else(|| {
+                eprintln!("Error: Field '{}' not found in entry '{}'.", field_name, args.entry);
+                exit(71);
+            });
         vec![(field_name.clone(), value)]
     } else {
         // Case: No specific field requested, export all fields except those matching the exclude regex (if provided).
