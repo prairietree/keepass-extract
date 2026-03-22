@@ -18,3 +18,20 @@ Ensure you have [Rust and Cargo](https://rustup.rs) installed.
 git clone <your-repo-url>
 cd keepass-field-exporter
 cargo build --release
+```
+
+# Exit codes
+
+## Database & Argument Errors
+
+-  2: Missing required argument.
+- 51: File Not Found. The specified database file was not found.
+
+## Entry Lookup Errors
+
+- 61: Entry Not Found. The entry name provided via --entry was not found in the database.
+- 62: Multiple entries with the exact same name were found. The first match will be returned.
+
+## Field Errors
+
+- 71: Field Not Found. The field requested via --field does not exist within the selected entry. Nothing will be returned.
