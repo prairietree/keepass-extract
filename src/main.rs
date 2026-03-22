@@ -1,4 +1,4 @@
-use clap::Parser;
+use argh::FromArgs;
 use std::fs::{self, File, OpenOptions};
 use std::path::PathBuf;
 use std::process::exit;
@@ -18,50 +18,35 @@ const DEFAULT_FIELDS: &[&str] = &[
     "Title", "UserName", "Password", "URL", "Notes", "UUID", "TOTP", "Tags", "Uuid"
 ];
 
-#[derive(Parser)]
-#[command(
-    name = "KeePass Field Exporter",
-    about = "A tool to extract specific fields or dump all field data from a KeePass database.",
-    after_help = "EXAMPLES:\n\
-        List all entries:\n    kp_tool -d db.kdbx\n\n\
-        List fields for an entry:\n    kp_tool -d db.kdbx -e 'Gmail'\n\n\
-        Print a specific password:\n    kp_tool -d db.kdbx -e 'Gmail' -f 'Password'\n\n\
-        Export all fields to a folder:\n    kp_tool -d db.kdbx -e 'Gmail' -o ./gmail_secrets\n\n\
-        Exit Codes:\n\
-        -  2: Missing required argument.\n\
-        - 51: File Not Found. The specified database file was not found.\n\
-        - 61: Entry Not Found. The entry name provided via --entry was not found in the database.\n\
-        - 62: Multiple entries with the exact same name were found. The first match will be returned.\n\
-        - 71: Field Not Found. The field requested via --field does not exist within the selected entry. Nothing will be returned."
-)]
-
+#[derive(FromArgs)]
+/// A tool to extract specific fields or dump all field data from a KeePass database.
 struct Args {
-    /// Path to the .kdbx database file
-    #[arg(short, long, required = true)]
+    /// path to the .kdbx database file
+    #[argh(option, short = 'd')]
     database: PathBuf,
 
-    /// Name of the entry to search for
-    #[arg(short, long, required = true)]
+    /// name of the entry to search for
+    #[argh(option, short = 'e')]
     entry: String,
 
-    /// Specific field to extract (e.g., 'Password', 'UserName', or custom fields)
-    #[arg(short, long)]
+    /// specific field to extract (e.g., 'Password', 'UserName')
+    #[argh(option, short = 'f')]
     field: Option<String>,
 
-    /// Output folder; creates one file per field in provided entry
-    #[arg(short = 'o', long)]
+    /// output folder; creates one file per field in provided entry
+    #[argh(option, short = 'o')]
     folder: Option<PathBuf>,
 
-    /// Path to a KeePass key file (if required)
-    #[arg(short, long)]
+    /// path to a KeePass key file (if required)
+    #[argh(option, short = 'k')]
     key_file: Option<PathBuf>,
 
-    /// Path to a file containing the database password
-    #[arg(short, long)]
+    /// path to a file containing the database password
+    #[argh(option, short = 'p')]
     pw_file: Option<PathBuf>,
 
-    /// If set, filters out default fields (Title, Password, etc.) from the export
-    #[arg(short = 'x', long)]
+    /// if set, filters out default fields (Title, Password, etc.)
+    #[argh(switch, short = 'x')]
     exclude_defaults: bool,
 }
 
@@ -83,7 +68,7 @@ fn collect_all_entries(group: &Group) -> Vec<&keepass::db::Entry> {
 }
 
 fn main() {
-    let args = Args::parse();
+    let args: Args = argh::from_env();
 
     // Check if database file exists.
     let db_path = args.database;
