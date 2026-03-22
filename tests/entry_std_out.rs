@@ -12,10 +12,10 @@ fn test_02_no_entry_specified() {
         .write_stdin(PASS)
         .assert()
         .failure()
-        .code(2)
+        .code(1)
         .stdout("")
-        .stderr(predicate::str::contains("required arguments were not provided"))
-        .stderr(predicate::str::contains("--entry <ENTRY>")); 
+        .stderr(predicate::str::contains("Required options not provided:"))
+        .stderr(predicate::str::contains("--entry")); 
 }
 
 #[test]

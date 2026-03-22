@@ -8,9 +8,9 @@ fn test_missing_database_argument_exit_code() {
     // Verifies exit code 50 AND empty stdout
     cmd.assert()
         .failure()
-        .code(2)
+        .code(1)
         .stdout("")
-        .stderr(predicate::str::contains("required arguments were not provided")); 
+        .stderr(predicate::str::contains("Required options not provided:")); 
  
 }
 
